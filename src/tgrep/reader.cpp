@@ -1,3 +1,13 @@
+// any todo is captured, regardless of leading whitespace and the mark inside the box [ ]
+//
+// what's a little less obvious is section titles and dates.  they are of the form:
+//
+// ----------- <date>
+// [<title>]
+//
+// titles are optional, but dates are not.  If no date is present, date/titles continue to
+// apply to later todos
+
 #include "error.hpp"
 #include "reader.hpp"
 #include "string.hpp"
@@ -12,7 +22,7 @@ public:
    { reader(tl).read(fpath); }
 
 private:
-   explicit reader(todoList& tl) : m_lineNumber(0), m_tl(tl) {}
+   explicit reader(todoList& tl) : m_lineNumber(0), m_nextIsTitle(false), m_tl(tl) {}
 
    void read(const std::string& fpath)
    {
@@ -35,9 +45,43 @@ private:
 
    void online(const std::string& line)
    {
-      auto trimmed = trimLeadingWhitespace(line);
-      if(trimmed.length() > 2 && trimmed.c_str()[0] == '[' && trimmed.c_str()[2] == ']')
-         createTodo(trimmed);
+      if(m_nextIsTitle)
+      {
+         m_nextIsTitle = false;
+
+         // try handle title
+         if(!line.empty())
+         {
+            std::cout << "title '" << line << "'" << std::endl;
+            m_sectionTitle = line;
+         }
+      }
+      else if(!handleSectionRule(line))
+      {
+         // handle todo
+         auto trimmed = trimLeadingWhitespace(line);
+         if(trimmed.length() > 2 && trimmed.c_str()[0] == '[' && trimmed.c_str()[2] == ']')
+            createTodo(trimmed);
+      }
+   }
+
+   bool handleSectionRule(const std::string& line)
+   {
+      const char *pThumb = line.c_str();
+      for(;*pThumb=='-'||*pThumb=='=';++pThumb);
+      if(pThumb == line.c_str())
+         return false;
+
+      auto trimmed = trimLeadingWhitespace(pThumb);
+      if(trimmed.empty())
+         return false;
+
+      std::cout << "date '" << trimmed << "'" << std::endl;
+      m_sectionDate = trimmed;
+      std::cout << "title cleared" << std::endl;
+      m_sectionTitle = "";
+      m_nextIsTitle = true;
+      return true;
    }
 
    void createTodo(const std::string& line)
@@ -58,6 +102,8 @@ private:
    unsigned long m_lineNumber;
    std::string m_sectionDate;
    std::string m_sectionTitle;
+
+   bool m_nextIsTitle;
 
    todoList& m_tl;
 };

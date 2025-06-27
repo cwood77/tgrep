@@ -1,6 +1,13 @@
 #include "string.hpp"
 #include <cstring>
 
+bool startsWith(const std::string& s, const std::string& prefix)
+{
+   if(s.length() < prefix.length())
+      return false;
+   return ::strncmp(s.c_str(),prefix.c_str(),prefix.length());
+}
+
 bool endsWith(const std::string& s, const std::string& suffix)
 {
    if(s.length() < suffix.length())

@@ -1,5 +1,18 @@
 [ ] test
  [/] not a test
 
+----------------------------------------- 4:46 PM 6/27/2025
+alas poor Yorick
+I knew him Horatio
 other text
 [ ] test 2
+    	[x] A fellow of
+
+--------------
+
+[ ] infinite jest
+
+
+-------------- 6:14 PM 6/27/2025
+
+[ ] whose lips

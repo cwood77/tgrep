@@ -1,0 +1,5 @@
+[ ] test
+ [/] not a test
+
+other text
+[ ] test 2
